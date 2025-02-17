@@ -11,8 +11,8 @@ const ISSUE_NUMBER = process.env.ISSUE_NUMBER;
 const [owner, repo] = process.env.REPO.split("/");
 
 const octokit = new Octokit(); // No need for an authentication token for public repos
-const openai = new OpenAI({ 
-  apiKey: OPENAI_API_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 async function fetchIssueDetails() {
