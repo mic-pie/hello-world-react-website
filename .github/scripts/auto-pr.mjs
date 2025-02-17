@@ -4,13 +4,13 @@ import { execSync } from 'child_process';
 import fs from 'fs-extra';
 import 'dotenv/config';
 
-// Initialize OpenAI client
-const openai = new OpenAI();
+/// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 // Initialize Octokit client
-const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN,
-});
+const octokit = new Octokit();
 
 const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
 const ISSUE_NUMBER = process.env.ISSUE_NUMBER;
