@@ -1,13 +1,12 @@
 name: Auto PR with ChatGPT (Full Repo Scan)
 
 on:
-  workflow_dispatch:
-  issues:
-    types: [labeled]
+  issue_comment:
+    types: [created] # Runs when a new comment is added
 
 jobs:
   auto-pr:
-    if: github.event.label.name == 'auto-fix'
+    if: contains(github.event.comment.body, '@bot fix this') # Run only if comment matches
     runs-on: ubuntu-latest
 
     steps:
