@@ -1,0 +1,31 @@
+name: Auto PR with ChatGPT (Full Repo Scan)
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  auto-pr:
+    if: github.event.label.name == 'auto-fix'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch the full repo history
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install @octokit/rest openai dotenv fs-extra
+
+      - name: Run Auto-PR Script
+        run: node .github/scripts/auto-pr.js
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
