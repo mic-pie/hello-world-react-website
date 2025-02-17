@@ -1,6 +1,7 @@
 name: Auto PR with ChatGPT (Full Repo Scan)
 
 on:
+  workflow_dispatch:
   issues:
     types: [labeled]
 
