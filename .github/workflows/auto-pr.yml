@@ -24,7 +24,7 @@ jobs:
         run: npm install @octokit/rest openai dotenv fs-extra
 
       - name: Run Auto-PR Script
-        run: node .github/scripts/auto-pr.js
+        run: node .github/scripts/auto-pr.mjs
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
