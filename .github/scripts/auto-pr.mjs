@@ -91,7 +91,7 @@ async function createPullRequest() {
 	filesToUpdate.forEach(({ filename, content }) => {
 	  console.log(`Updating file: ${filename}`);
 	  // Ensure directories exist before writing the file
-	  const dir = path.dirname(filePath);
+	  const dir = path.dirname(filename);
 	  if (!fs.existsSync(dir)) {
 		  fs.mkdirSync(dir, { recursive: true });
 		  }
