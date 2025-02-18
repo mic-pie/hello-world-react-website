@@ -14,6 +14,8 @@ const octokit = new Octokit();
 
 const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
 const ISSUE_NUMBER = process.env.ISSUE_NUMBER;
+const GIT_EMAIL = process.env.GIT_EMAIL
+const GIT_NAME = process.env.GIT_NAME
 
 async function fetchIssueDetails() {
   const { data } = await octokit.issues.get({
@@ -22,34 +24,6 @@ async function fetchIssueDetails() {
     issue_number: ISSUE_NUMBER,
   });
   return `${data.title}\n\n${data.body}`;
-}
-
-async function fetchRepoFiles(dir = '') {
-  let files = [];
-  const { data } = await octokit.repos.getContent({ owner, repo, path: dir });
-
-  for (const item of data) {
-    if (item.type === 'file') {
-      files.push(item.path);
-    } else if (item.type === 'dir') {
-      files = files.concat(await fetchRepoFiles(item.path)); // Recursively fetch all files
-    }
-  }
-  return files;
-}
-
-async function fetchFileContent(filePath) {
-  const { data } = await octokit.repos.getContent({ owner, repo, path: filePath });
-  return Buffer.from(data.content, 'base64').toString('utf-8');
-}
-
-async function generateRepoSummary(fileList) {
-  let repoSummary = '';
-  for (let file of fileList) {
-    const fileContent = await fetchFileContent(file);
-    repoSummary += `### File: ${file}\n${fileContent.slice(0, 500)}\n\n`; // Limit content size to prevent token overflow
-  }
-  return repoSummary;
 }
 
 async function modifyCodeWithChatGPT(issueDetails, repoSummary) {
@@ -66,6 +40,8 @@ async function modifyCodeWithChatGPT(issueDetails, repoSummary) {
 
 async function createPullRequest() {
   const branchName = `auto-fix-issue-${ISSUE_NUMBER}`;
+  execSync(`git config user.email ${GIT_EMAIL}`);
+  execSync(`git config user.name ${GIT_NAME}`);
   execSync(`git checkout -b ${branchName}`);
   execSync('git add .');
   execSync('git commit -m "Auto-fix by ChatGPT"');
