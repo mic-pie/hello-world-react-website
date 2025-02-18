@@ -54,7 +54,7 @@ async function generateRepoSummary(fileList) {
 
 async function modifyCodeWithChatGPT(issueDetails, repoSummary) {
   const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: 'gpt-4o',
     messages: [
       { role: 'system', content: 'You are an expert AI developer specialized in improving existing code based on user requests. Your job is to take a GitHub issue created by a user, verify if the problem actually occurs and provide full code for all modified files that will fix the issue. Respond strictly in JSON format with no additional explanation. If a code change is needed, respond with:{"filename": "<relative-path-to-file>","content": "<full file content>"} If multiple files need changes, return an array:[{ "filename": "<file1>", "content": "<new content>" },{ "filename": "<file2>", "content": "<new content>" }] Do not include any explanations or comments. Only return valid JSON.' },
       { role: 'user', content: `### Issue Details:\n${issueDetails}\n\n### GitHub Repository:\n${repoSummary}\n\n### Modify the code to fix the issue.` },
@@ -84,27 +84,46 @@ async function createPullRequest() {
 (async function run() {
   try {
     const issueDetails = await fetchIssueDetails();
-    const allFiles = await fetchRepoFiles();
+    //const allFiles = await fetchRepoFiles();
 
-    console.log('Fetching repo content...');
-    const repoSummary = await generateRepoSummary(allFiles); // Fetch and summarize the entire repo
+    //console.log('Fetching repo content...');
+    //const repoSummary = await generateRepoSummary(allFiles); // Fetch and summarize the entire repo
 
     console.log('Sending repo summary to ChatGPT...');
     const modifiedCode = await modifyCodeWithChatGPT(issueDetails, 'https://github.com/mic-pie/hello-world-react-website');
 
     // Write the modified code back to files
 	console.log('ModifiedCode: ' + modifiedCode );
-    const modifiedFiles = modifiedCode.split('\n\n');
-	console.log('For-loop');
-    for (const modifiedFile of modifiedFiles) {
-      console.log('modifiedCode: ' + modifiedCode);
-	  const [filePath, ...codeLines] = modifiedFile.split(':');
-	  console.log('filePath: ' + filePath);
-      const code = codeLines.join(':').trim();
-      if (code) {
-        fs.writeFileSync(filePath, code, 'utf-8');
-      }
-    }
+
+	console.log('Parsing response to JSON');
+	let filesToUpdate = [];
+	try {
+	  filesToUpdate = JSON.parse(modifiedCode);
+	} catch (error) {
+	  console.error("Error parsing AI response:", error);
+	  return;
+	}
+
+	if (!Array.isArray(filesToUpdate)) {
+	  console.error("AI response is not a valid file array:", filesToUpdate);
+	  return;
+	}
+
+	console.log('Updating files...');
+	filesToUpdate.forEach(({ filename, content }) => {
+	  console.log(`Updating file: ${filename}`);
+	  fs.writeFileSync(filename, content, "utf-8");
+	});
+	console.log('Files updated');
+
+    // const modifiedFiles = modifiedCode.split('\n\n');
+    // for (const modifiedFile of modifiedFiles) {
+	  // const [filePath, ...codeLines] = modifiedFile.split(':');
+      // const code = codeLines.join(':').trim();
+      // if (code) {
+        // fs.writeFileSync(filePath, code, 'utf-8');
+      // }
+    // }
 
     await createPullRequest();
   } catch (error) {
