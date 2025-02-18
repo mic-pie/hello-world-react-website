@@ -2,6 +2,7 @@ import OpenAI from 'openai';
 import { Octokit } from '@octokit/rest';
 import { execSync } from 'child_process';
 import fs from 'fs-extra';
+import path from 'path';
 import 'dotenv/config';
 
 /// Initialize OpenAI client
@@ -67,7 +68,6 @@ async function createPullRequest() {
 
     console.log('Sending repo summary to ChatGPT...');
     const aiResponse = await modifyCodeWithChatGPT(issueDetails, 'https://github.com/mic-pie/hello-world-react-website');
-	console.log('aiResponse: ' + aiResponse );
 	
 	const aiCleanResponse = aiResponse.replace(/^```json\s*|\s*```$/g, '');
 	console.log('aiCleanResponse: ' + aiCleanResponse );
@@ -90,6 +90,12 @@ async function createPullRequest() {
 	console.log('Updating files...');
 	filesToUpdate.forEach(({ filename, content }) => {
 	  console.log(`Updating file: ${filename}`);
+	  // Ensure directories exist before writing the file
+	  const dir = path.dirname(filePath);
+	  if (!fs.existsSync(dir)) {
+		  fs.mkdirSync(dir, { recursive: true });
+		  }
+
 	  fs.writeFileSync(filename, content, "utf-8");
 	});
 	console.log('Files updated');
