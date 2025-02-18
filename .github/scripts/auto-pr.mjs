@@ -90,8 +90,7 @@ async function createPullRequest() {
     //const repoSummary = await generateRepoSummary(allFiles); // Fetch and summarize the entire repo
 
     console.log('Sending repo summary to ChatGPT...');
-    let modifiedCode = await modifyCodeWithChatGPT(issueDetails, 'https://github.com/mic-pie/hello-world-react-website');
-	modifiedCode = modifiedCode.Replace()
+    const modifiedCode = await modifyCodeWithChatGPT(issueDetails, 'https://github.com/mic-pie/hello-world-react-website');
 
     // Write the modified code back to files
 	console.log('ModifiedCode: ' + modifiedCode );
