@@ -13,10 +13,12 @@ const openai = new OpenAI({
 // Initialize Octokit client
 const octokit = new Octokit();
 
-const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
+const GIT_EMAIL = process.env.GIT_EMAIL;
+const GIT_NAME = process.env.GIT_NAME;
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GIT_REPO = process.env.GIT_REPO;
+const [owner, repo] = process.env.GIT_REPO.split('/');
 const ISSUE_NUMBER = process.env.ISSUE_NUMBER;
-const GIT_EMAIL = process.env.GIT_EMAIL
-const GIT_NAME = process.env.GIT_NAME
 
 async function fetchIssueDetails() {
   const { data } = await octokit.issues.get({
@@ -43,6 +45,7 @@ async function createPullRequest() {
   const branchName = `auto-fix-issue-${ISSUE_NUMBER}`;
   execSync(`git config user.email ${GIT_EMAIL}`);
   execSync(`git config user.name ${GIT_NAME}`);
+  execSync(`git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GIT_REPO}.git`);
   execSync(`git checkout -b ${branchName}`);
   execSync('git add .');
   execSync('git commit -m "Auto-fix by ChatGPT"');
