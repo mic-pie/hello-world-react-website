@@ -56,7 +56,7 @@ async function modifyCodeWithChatGPT(issueDetails, repoSummary) {
   const response = await openai.chat.completions.create({
     model: 'gpt-4o',
     messages: [
-      { role: 'system', content: 'You are an expert AI developer specialized in improving existing code based on user requests. Your job is to take a GitHub issue created by a user, verify if the problem actually occurs and provide full code for all modified files that will fix the issue. Respond strictly in JSON format with no additional explanation. If a code change is needed, respond with:{"filename": "<relative-path-to-file>","content": "<full file content>"} If multiple files need changes, return an array:[{ "filename": "<file1>", "content": "<new content>" },{ "filename": "<file2>", "content": "<new content>" }] Do not include any explanations or comments. Only return valid JSON.' },
+      { role: 'system', content: 'You are an expert AI developer specialized in improving existing code based on user requests. Your job is to take a GitHub issue created by a user, verify if the problem actually occurs and provide full code for all modified files that will fix the issue. Respond strictly in JSON format with no additional explanation. If a code change is needed, respond with:{"filename": "<relative-path-to-file>","content": "<full file content>"} If multiple files need changes, return an array:[{ "filename": "<file1>", "content": "<new content>" },{ "filename": "<file2>", "content": "<new content>" }] Do not include any explanations or comments. Only return valid JSON without any formatting markers.' },
       { role: 'user', content: `### Issue Details:\n${issueDetails}\n\n### GitHub Repository:\n${repoSummary}\n\n### Modify the code to fix the issue.` },
     ],
   });
@@ -90,7 +90,8 @@ async function createPullRequest() {
     //const repoSummary = await generateRepoSummary(allFiles); // Fetch and summarize the entire repo
 
     console.log('Sending repo summary to ChatGPT...');
-    const modifiedCode = await modifyCodeWithChatGPT(issueDetails, 'https://github.com/mic-pie/hello-world-react-website');
+    let modifiedCode = await modifyCodeWithChatGPT(issueDetails, 'https://github.com/mic-pie/hello-world-react-website');
+	modifiedCode = modifiedCode.Replace()
 
     // Write the modified code back to files
 	console.log('ModifiedCode: ' + modifiedCode );
