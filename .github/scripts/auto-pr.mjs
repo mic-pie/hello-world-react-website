@@ -93,9 +93,13 @@ async function createPullRequest() {
     const modifiedCode = await modifyCodeWithChatGPT(issueDetails, repoSummary);
 
     // Write the modified code back to files
+	console.log('ModifiedCode: ' + modifiedCode );
     const modifiedFiles = modifiedCode.split('\n\n');
+	console.log('For-loop');
     for (const modifiedFile of modifiedFiles) {
-      const [filePath, ...codeLines] = modifiedFile.split(':');
+      console.log('modifiedCode: ' + modifiedCode);
+	  const [filePath, ...codeLines] = modifiedFile.split(':');
+	  console.log('filePath: ' + filePath);
       const code = codeLines.join(':').trim();
       if (code) {
         fs.writeFileSync(filePath, code, 'utf-8');
