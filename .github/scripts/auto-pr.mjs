@@ -54,7 +54,7 @@ async function generateRepoSummary(fileList) {
 
 async function modifyCodeWithChatGPT(issueDetails, repoSummary) {
   const response = await openai.chat.completions.create({
-    model: 'gpt-4',
+    model: 'gpt-3.5',
     messages: [
       { role: 'system', content: 'You are an AI developer improving code based on user requests.' },
       { role: 'user', content: `### Issue Details:\n${issueDetails}\n\n### Repo Structure and Content:\n${repoSummary}\n\n### Modify the code to fix the issue.` },
