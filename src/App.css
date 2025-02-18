@@ -1,8 +1,12 @@
-.App {
-  text-align: center;
-  margin-top: 50px;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
 }
 
-h1 {
-  color: #61dafb;
+.App {
+  text-align: center;
+}
+
+main {
+  padding: 20px;
 }
