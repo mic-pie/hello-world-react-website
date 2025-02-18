@@ -90,15 +90,17 @@ async function createPullRequest() {
     //const repoSummary = await generateRepoSummary(allFiles); // Fetch and summarize the entire repo
 
     console.log('Sending repo summary to ChatGPT...');
-    const modifiedCode = await modifyCodeWithChatGPT(issueDetails, 'https://github.com/mic-pie/hello-world-react-website');
-
+    const aiResponse = await modifyCodeWithChatGPT(issueDetails, 'https://github.com/mic-pie/hello-world-react-website');
+	console.log('aiResponse: ' + aiResponse );
+	
+	const aiCleanResponse = aiResponse.replace(/^```json\s*|\s*```$/g, '');
+	console.log('aiCleanResponse: ' + aiCleanResponse );
+	
     // Write the modified code back to files
-	console.log('ModifiedCode: ' + modifiedCode );
-
 	console.log('Parsing response to JSON');
 	let filesToUpdate = [];
 	try {
-	  filesToUpdate = JSON.parse(modifiedCode);
+	  filesToUpdate = JSON.parse(aiCleanResponse);
 	} catch (error) {
 	  console.error("Error parsing AI response:", error);
 	  return;
@@ -116,7 +118,7 @@ async function createPullRequest() {
 	});
 	console.log('Files updated');
 
-    // const modifiedFiles = modifiedCode.split('\n\n');
+    // const modifiedFiles = aiResponse.split('\n\n');
     // for (const modifiedFile of modifiedFiles) {
 	  // const [filePath, ...codeLines] = modifiedFile.split(':');
       // const code = codeLines.join(':').trim();
